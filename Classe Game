@@ -1,0 +1,94 @@
+import java.util.*;
+
+class Game {
+    private final Board board = new Board();
+    private final List<Player> players = new ArrayList<>();
+    private final Random dice = new Random();
+    private double salary;
+    private int maxRounds;
+
+    public void addPlayer(String name, double initialBalance) {
+        players.add(new Player(name, initialBalance));
+    }
+
+    public void addHouse(String name, String type, double purchasePrice, double rentPrice) {
+        board.addHouse(name, type, purchasePrice, rentPrice);
+    }
+
+    public void setInitialSettings(double salary, int maxRounds) {
+        this.salary = salary;
+        this.maxRounds = maxRounds;
+    }
+
+    public void startGame() {
+        System.out.println("\nIniciando o jogo...");
+        for (int round = 1; round <= maxRounds; round++) {
+            System.out.println("\n--- Rodada " + round + " ---");
+            for (Player player : players) {
+                playTurn(player);
+                if (players.stream().filter(p -> p.balance > 0).count() == 1) {
+                    System.out.println("Fim do jogo: Apenas um jogador permanece.");
+                    declareWinner();
+                    return;
+                }
+            }
+        }
+        declareWinner();
+    }
+
+    private void playTurn(Player player) {
+        if (player.balance <= 0) {
+            System.out.println(player.name + " está falido e será ignorado.");
+            return;
+        }
+
+        int diceRoll = dice.nextInt(6) + 1;
+        player.position += diceRoll;
+        Board.Node currentHouse = board.getHouse(player.position);
+
+        System.out.println(player.name + " rolou o dado: " + diceRoll);
+        System.out.printf("Parou na casa: %s (Tipo: %s)%n", currentHouse.name, currentHouse.type);
+
+        switch (currentHouse.type) {
+            case "Início" -> {
+                player.receive(salary);
+                System.out.printf("%s recebeu o salário de %.2f.%n", player.name, salary);
+            }
+            case "Imóvel" -> handleProperty(player, currentHouse);
+            case "Imposto" -> {
+                double tax = player.balance * 0.05;
+                player.pay(tax);
+                System.out.printf("%s pagou imposto de %.2f.%n", player.name, tax);
+            }
+            case "Restituição" -> {
+                double refund = salary * 0.10;
+                player.receive(refund);
+                System.out.printf("%s recebeu uma restituição de %.2f.%n", player.name, refund);
+            }
+        }
+    }
+
+    private void handleProperty(Player player, Board.Node house) {
+        if (house.purchasePrice > 0) {
+            if (player.balance >= house.purchasePrice) {
+                player.pay(house.purchasePrice);
+                player.addProperty(house.name);
+                house.purchasePrice = 0; // Marca como vendido
+                System.out.printf("%s comprou o imóvel %s por %.2f.%n", player.name, house.name, house.purchasePrice);
+            } else {
+                System.out.printf("%s tentou comprar o imóvel %s, mas não tem saldo suficiente.%n", player.name, house.name);
+            }
+        } else {
+            double rent = house.rentPrice;
+            player.pay(rent);
+            System.out.printf("%s pagou aluguel de %.2f no imóvel %s.%n", player.name, rent, house.name);
+        }
+    }
+
+    private void declareWinner() {
+        players.sort((p1, p2) -> Double.compare(p2.balance, p1.balance));
+        System.out.println("\n--- Resultado Final ---");
+        players.forEach(Player::printStatus);
+        System.out.printf("\nVencedor: %s com saldo de %.2f.%n", players.get(0).name, players.get(0).balance);
+    }
+}
