@@ -1,0 +1,60 @@
+import java.util.ArrayList;
+import java.util.List;
+
+class Board {
+    static class Node {
+        String name;
+        String type; // "Início", "Imóvel", "Imposto", "Restituição"
+        double purchasePrice;
+        double rentPrice;
+        Node next;
+
+        Node(String name, String type, double purchasePrice, double rentPrice) {
+            this.name = name;
+            this.type = type;
+            this.purchasePrice = purchasePrice;
+            this.rentPrice = rentPrice;
+            this.next = null;
+        }
+    }
+
+    private Node head;
+    private int size = 0;
+
+    public void addHouse(String name, String type, double purchasePrice, double rentPrice) {
+        Node newNode = new Node(name, type, purchasePrice, rentPrice);
+        if (head == null) {
+            head = newNode;
+            head.next = head; // Circularidade
+        } else {
+            Node temp = head;
+            while (temp.next != head) {
+                temp = temp.next;
+            }
+            temp.next = newNode;
+            newNode.next = head;
+        }
+        size++;
+    }
+
+    public Node getHouse(int position) {
+        Node current = head;
+        for (int i = 0; i < position % size; i++) {
+            current = current.next;
+        }
+        return current;
+    }
+
+    public void printBoard() {
+        if (head == null) {
+            System.out.println("O tabuleiro está vazio.");
+            return;
+        }
+        Node temp = head;
+        do {
+            System.out.printf("Casa: %s, Tipo: %s, Preço: %.2f, Aluguel: %.2f%n", 
+                              temp.name, temp.type, temp.purchasePrice, temp.rentPrice);
+            temp = temp.next;
+        } while (temp != head);
+    }
+}
