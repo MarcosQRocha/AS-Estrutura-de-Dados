@@ -1,0 +1,33 @@
+import java.util.ArrayList;
+import java.util.List;
+
+class Player {
+    String name;
+    double balance;
+    int position;
+    List<String> properties;
+
+    Player(String name, double balance) {
+        this.name = name;
+        this.balance = balance;
+        this.position = 0; // Começa na casa "Início"
+        this.properties = new ArrayList<>();
+    }
+
+    public void addProperty(String property) {
+        properties.add(property);
+    }
+
+    public void pay(double amount) {
+        balance -= amount;
+    }
+
+    public void receive(double amount) {
+        balance += amount;
+    }
+
+    public void printStatus() {
+        System.out.printf("Jogador: %s, Saldo: %.2f, Posição: %d, Propriedades: %s%n",
+                          name, balance, position, properties);
+    }
+}
