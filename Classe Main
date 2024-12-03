@@ -1,0 +1,32 @@
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Game game = new Game();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Configuração Inicial do Jogo");
+        System.out.print("Salário dos jogadores: ");
+        double salary = scanner.nextDouble();
+        System.out.print("Número máximo de rodadas: ");
+        int maxRounds = scanner.nextInt();
+        scanner.nextLine();
+
+        game.setInitialSettings(salary, maxRounds);
+
+        // Cadastro de imóveis
+        game.addHouse("Casa do Bosque", "Imóvel", 200_000, 1_100);
+        game.addHouse("Apartamento Central", "Imóvel", 350_000, 1_800);
+        game.addHouse("Vila das Flores", "Imóvel", 400_000, 2_200);
+        game.addHouse("Início", "Início", 0, 0);
+        game.addHouse("Imposto", "Imposto", 0, 0);
+        game.addHouse("Restituição", "Restituição", 0, 0);
+
+        // Cadastro de jogadores
+        game.addPlayer("Alice", 1_000_000);
+        game.addPlayer("Bob", 1_000_000);
+
+        // Iniciar o jogo
+        game.startGame();
+    }
+}
